@@ -3,31 +3,11 @@ let express = require('express');
 var routeFactory = function(Book){
 
     let bookRouter = express.Router();
+    let bookController = require('../controllers/bookController')(Book);
 
     bookRouter.route('/')
-        .post(function(req, res){
-            let book = new Book(req.body);
-            console.log(book);
-            book.save();
-            res.status(201).send(book);
-        })
-        .get(function(req, res){
-            let query = {};
-
-            // Build query string to pass to mongodb
-            if(req.query.genre){
-                query.genre = req.query.genre
-            }
-
-            Book.find(query, function(err, results){
-                if(err){
-                    console.log(err);
-                    res.status(500).send(err);
-                }else{
-                    res.json(results);
-                }
-            });
-        });
+        .post(bookController.createBook)
+        .get(bookController.getBooks);
 
     // Using middleware to fetch book before other routes
     bookRouter.use('/:id', function(req, res, next){
