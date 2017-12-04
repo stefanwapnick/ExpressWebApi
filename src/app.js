@@ -1,14 +1,45 @@
-var express = require('express');
-var app = express();
+let express = require('express');
+let mongoose = require('mongoose');
+
+let db = mongoose.connect('mongodb://localhost/bookAPI');
+let app = express();
+
+let Book = require('./models/bookModel');
 
 // Note that nodemon will set PORT variable when it runs in gulp
-var port = process.env.PORT || 3000;
+let port = process.env.PORT || 3000;
 
-var bookRouter = express.Router();
+let bookRouter = express.Router();
 
 bookRouter.route('/books')
     .get(function(req, res){
-        res.json({hello: 'value'});
+        let query = {};
+
+        // Build query string to pass to mongodb
+        if(req.query.genre){
+            query.genre = req.query.genre
+        }
+
+        Book.find(query, function(err, results){
+           if(err){
+                console.log(err);
+                res.status(500).send(err);
+           }else{
+                res.json(results);
+           }
+        });
+    });
+
+bookRouter.route('/books/:id')
+    .get(function(req, res){
+
+        Book.findById(req.params.id, function(err, result){
+            if(err){
+                res.status(500).send(err);
+            }else{
+                res.json(result);
+            }
+        });
     });
 
 app.use('/api', bookRouter);
