@@ -5,6 +5,7 @@ var routeFactory = function(Book){
     let bookRouter = express.Router();
     let bookController = require('../controllers/bookController')(Book);
 
+    // Example of using controller that route forwards request to
     bookRouter.route('/')
         .post(bookController.createBook)
         .get(bookController.getBooks);
@@ -64,6 +65,8 @@ var routeFactory = function(Book){
                     res.status(204);
             });
         });
+
+    return bookRouter;
 };
 
 module.exports = routeFactory;
